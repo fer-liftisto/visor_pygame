@@ -1,0 +1,12 @@
+.pyc
+__pycache__/
+venv/
+.env/
+.vscode/
+pruevas/
+*.log
+*.tmp
+*.txt
+Pipfile.lock
+Pipfile
+tempCodeRunnerFile.py
