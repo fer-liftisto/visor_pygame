@@ -4,6 +4,7 @@ venv/
 .env/
 .vscode/
 pruevas/
+ajerez_grafico/
 *.log
 *.tmp
 *.txt
