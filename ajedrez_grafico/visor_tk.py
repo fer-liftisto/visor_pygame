@@ -1,3 +1,4 @@
+
 from  icecream import ic
 import re
 import io
@@ -136,3 +137,4 @@ if __name__ == "__main__":
         
     ic(' '.join(movimientos))
     ChessViewer(' '.join(movimientos)).mainloop()
+    
