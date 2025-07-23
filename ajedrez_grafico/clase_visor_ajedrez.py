@@ -38,11 +38,56 @@ class VisorPGN:
                 screen.blit(text, (col * self.TILE_SIZE +
                             8, fila * self.TILE_SIZE + 4))
 
+    def mostrar_planilla(self):
+        # Crea una ventana de texto con la planilla de movimientos
+        pygame.init()
+        font = pygame.font.SysFont("Consolas", 24)
+        width, height = 400, 600
+        screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Planilla de ajedrez")
+        running = True
+
+        # Genera la planilla en formato tradicional
+        texto = ""
+        board = chess.Board()
+        for i, mov in enumerate(self.movimientos):
+            if i % 2 == 0:
+                texto += f"{(i//2)+1}. "
+            texto += mov + " "
+            board.push_san(mov)
+            if i % 2 == 1:
+                texto += "\n"
+
+        # Renderiza la planilla
+        lines = texto.split('\n')
+        while running:
+            screen.fill((255, 255, 255))
+            for idx, line in enumerate(lines):
+                img = font.render(line, True, (0, 0, 0))
+                screen.blit(img, (10, 10 + idx * 30))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            pygame.display.flip()
+        pygame.quit()
+
     def mostrar(self):
         pygame.init()
-        screen = pygame.display.set_mode((self.BOARD_SIZE, self.BOARD_SIZE))
-        pygame.display.set_caption("Visor PGN con pygame")
+        # Nueva ventana más ancha para tablero + planilla
+        screen = pygame.display.set_mode((self.BOARD_SIZE + 300, self.BOARD_SIZE))
+        pygame.display.set_caption("Visor PGN con planilla")
         board = chess.Board()
+        font = pygame.font.SysFont("Consolas", 24)
+
+        # Prepara la planilla de movimientos
+        texto = ""
+        for i, mov in enumerate(self.movimientos):
+            if i % 2 == 0:
+                texto += f"{(i//2)+1}. "
+            texto += mov + " "
+            if i % 2 == 1:
+                texto += "\n"
+        lines = texto.split('\n')
 
         for i, mov in enumerate(self.movimientos, 1):
             for event in pygame.event.get():
@@ -52,6 +97,34 @@ class VisorPGN:
             board.push_san(mov)
             self.dibujar_tablero(screen)
             self.dibujar_piezas(screen, board)
+            screen.fill((255, 255, 255), rect=pygame.Rect(self.BOARD_SIZE, 0, 300, self.BOARD_SIZE))
+            jugada_actual = (i-1)//2
+            max_lines = self.BOARD_SIZE // 30 - 1
+            start_line = max(0, jugada_actual - max_lines//2)
+            end_line = min(len(lines), start_line + max_lines)
+            for idx in range(start_line, end_line):
+                line = lines[idx]
+                # Divide la línea en número de jugada, movimiento blanco y movimiento negro
+                partes = line.strip().split()
+                x_base = self.BOARD_SIZE + 10
+                y_base = 10 + (idx-start_line) * 30
+                x = x_base
+                # Número de jugada
+                if partes:
+                    img = font.render(partes[0], True, (0, 0, 0))
+                    screen.blit(img, (x, y_base))
+                    x += img.get_width() + 10
+                # Movimiento blanco
+                if len(partes) > 1:
+                    color = (255, 0, 0) if (idx == jugada_actual and i % 2 == 1) else (0, 0, 0)
+                    img = font.render(partes[1], True, color)
+                    screen.blit(img, (x, y_base))
+                    x += img.get_width() + 10
+                # Movimiento negro
+                if len(partes) > 2:
+                    color = (255, 0, 0) if (idx == jugada_actual and i % 2 == 0) else (0, 0, 0)
+                    img = font.render(partes[2], True, color)
+                    screen.blit(img, (x, y_base))
             pygame.display.flip()
             pygame.time.wait(int(self.delay * 1000))
 
